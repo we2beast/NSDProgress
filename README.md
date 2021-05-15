@@ -8,11 +8,21 @@ We have built a front end interface to make the interaction easier. Clone the ap
 </p>
 
 ## Commands
+1. NSD:
  ```
 flow start CreateNewAccount acctName: Radmir
 flow start FiatCurrencyIssueFlow currency: RUB, amount: 1000, recipient: Radmir
  ```
- 
+2. Example Org:
+ ```
+flow start CreateNewStockFlow symbol: test, name: Loan, currency: RUB, price: 10000.0, issueVol: 20
+run vaultQuery contractStateType: com.r3.corda.lib.tokens.contracts.states.FungibleToken
+ ```
+3. NSD:
+ ```
+flow start IssueStockToken uuid: 59e4a0f8-4241-4005-9f76-5b5e76aa252c
+run vaultQuery contractStateType: net.corda.nrd.states.StockState // Получение всех аппрувнытых токенов
+ ```
  
  ## Running the applications 
  ```

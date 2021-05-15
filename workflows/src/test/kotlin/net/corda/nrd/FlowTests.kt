@@ -7,15 +7,14 @@ import net.corda.testing.node.TestCordapp
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import net.corda.nrd.flows.CreateMyToken
-import net.corda.nrd.flows.IssueToken
+import net.corda.nrd.flows.CreateStockToken
+import net.corda.nrd.flows.IssueStockToken
 import net.corda.nrd.states.CustomTokenState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.common.internal.testNetworkParameters
-import net.corda.testing.core.singleIdentity
 import net.corda.testing.node.StartedMockNode
 import java.util.*
 import kotlin.test.assertEquals
@@ -52,7 +51,7 @@ class FlowTests {
     fun `Check the correct message is stored`() {
 
         val msg = "Test Message"
-        val flow = CreateMyToken("Thomas@gmail.com","peter@gmail.com", msg)
+        val flow = CreateStockToken("Thomas@gmail.com","peter@gmail.com", msg)
         val future = a.startFlow(flow)
         network.runNetwork()
         val tokenStateID = future.getOrThrow()
@@ -64,11 +63,11 @@ class FlowTests {
     @Test
     fun `Check if non fungible token correctly created`(){
         val msg = "Token Creation"
-        val createTokenflow = CreateMyToken("Thomas@gmail.com","peter@gmail.com", msg)
+        val createTokenflow = CreateStockToken("Thomas@gmail.com","peter@gmail.com", msg)
         val future = a.startFlow(createTokenflow)
         network.runNetwork()
         val tokenStateID = future.getOrThrow()
-        val issueTokenflow = IssueToken(tokenStateID.id.toString())
+        val issueTokenflow = IssueStockToken(tokenStateID.id.toString())
         val future2 = a.startFlow(issueTokenflow)
         network.runNetwork()
         val resultString = future2.getOrThrow()

@@ -29,13 +29,9 @@ class FiatCurrencyIssueFlow(
     @Suspendable
     override fun call(): String {
         val token = FiatCurrency.Companion.getInstance(currency)
-        println("1")
         val myAccount = accountService.accountInfo(recipient).single().state.data
-        println("2")
         val myKey = subFlow(NewKeyForAccount(myAccount.identifier.id)).owningKey
-        println("3")
         val fungibleToken: FungibleToken = amount of token issuedBy ourIdentity heldBy AnonymousParty(myKey)
-        println("4")
 
         val stx = subFlow(IssueTokens(listOf(fungibleToken)))
         return "Issued $amount $currency token(s) to $recipient"

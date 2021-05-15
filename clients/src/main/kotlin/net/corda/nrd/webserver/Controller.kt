@@ -2,8 +2,8 @@ package net.corda.nrd.webserver
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import net.corda.nrd.flows.CreateMyToken
-import net.corda.nrd.flows.IssueToken
+import net.corda.nrd.flows.CreateStockToken
+import net.corda.nrd.flows.IssueStockToken
 import net.corda.nrd.flows.QueryToken
 import net.corda.core.internal.toX500Name
 import net.corda.core.messaging.startFlow
@@ -66,8 +66,8 @@ class Controller(rpc: NodeRPCConnection) {
         println(messageStr)
         return try {
             val tokenStateId =
-                proxy.startFlow(::CreateMyToken, senderStr, receiverStr, messageStr).returnValue.get().toString()
-            val result = proxy.startFlow(::IssueToken, tokenStateId).returnValue.get()
+                proxy.startFlow(::CreateStockToken, senderStr, receiverStr, messageStr).returnValue.get().toString()
+            val result = proxy.startFlow(::IssueStockToken, tokenStateId).returnValue.get()
             ResponseEntity.status(HttpStatus.CREATED).body(result)
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
