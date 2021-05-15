@@ -1,6 +1,6 @@
-package net.corda.samples.tokentofriend.contracts
+package net.corda.nrd.contracts
 
-import net.corda.samples.tokentofriend.states.CustomTokenState
+import net.corda.nrd.states.CustomTokenState
 import groovy.util.GroovyTestCase.assertEquals
 import net.corda.testing.node.MockServices
 import org.junit.Test

@@ -1,4 +1,4 @@
-package net.corda.samples.tokentofriend
+package net.corda.nrd
 
 import com.r3.corda.lib.tokens.contracts.states.NonFungibleToken
 import net.corda.testing.node.MockNetwork
@@ -7,9 +7,9 @@ import net.corda.testing.node.TestCordapp
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import net.corda.samples.tokentofriend.flows.CreateMyToken
-import net.corda.samples.tokentofriend.flows.IssueToken
-import net.corda.samples.tokentofriend.states.CustomTokenState
+import net.corda.nrd.flows.CreateMyToken
+import net.corda.nrd.flows.IssueToken
+import net.corda.nrd.states.CustomTokenState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.QueryCriteria

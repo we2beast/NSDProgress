@@ -1,8 +1,8 @@
-package net.corda.samples.tokentofriend.flows
+package net.corda.nrd.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.states.NonFungibleToken
-import net.corda.samples.tokentofriend.states.CustomTokenState
+import net.corda.nrd.states.CustomTokenState
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.node.services.Vault

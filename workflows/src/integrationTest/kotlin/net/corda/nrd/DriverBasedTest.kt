@@ -1,4 +1,4 @@
-package net.corda.samples.tokentofriend
+package net.corda.nrd
 
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.utilities.getOrThrow

@@ -1,10 +1,10 @@
-package net.corda.samples.tokentofriend.flows
+package net.corda.nrd.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.states.NonFungibleToken
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import com.r3.corda.lib.tokens.workflows.flows.rpc.IssueTokens
-import net.corda.samples.tokentofriend.states.CustomTokenState
+import net.corda.nrd.states.CustomTokenState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.StartableByRPC

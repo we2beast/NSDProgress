@@ -1,4 +1,4 @@
-package net.corda.samples.tokentofriend.webserver
+package net.corda.nrd.webserver
 
 import org.springframework.boot.Banner
 import org.springframework.boot.SpringApplication

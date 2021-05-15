@@ -6,6 +6,12 @@ We have built a front end interface to make the interaction easier. Clone the ap
 <p align="center">
   <img src="./diagram.png" alt="Corda" width="600">
 </p>
+
+## Commands
+ ```
+flow start CreateNewAccount acctName: Radmir
+flow start FiatCurrencyIssueFlow currency: RUB, amount: 1000, recipient: Radmir
+ ```
  
  
  ## Running the applications 

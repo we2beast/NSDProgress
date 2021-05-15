@@ -1,10 +1,10 @@
-package net.corda.samples.tokentofriend.webserver
+package net.corda.nrd.webserver
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import net.corda.samples.tokentofriend.flows.CreateMyToken
-import net.corda.samples.tokentofriend.flows.IssueToken
-import net.corda.samples.tokentofriend.flows.QueryToken
+import net.corda.nrd.flows.CreateMyToken
+import net.corda.nrd.flows.IssueToken
+import net.corda.nrd.flows.QueryToken
 import net.corda.core.internal.toX500Name
 import net.corda.core.messaging.startFlow
 import net.corda.core.node.NodeInfo
@@ -16,27 +16,21 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-
-/**
- * Define your API endpoints here.
- */
 @RestController
-@RequestMapping("/") // The paths for HTTP requests are relative to this base path.
+@RequestMapping("/")
 class Controller(rpc: NodeRPCConnection) {
 
     private val proxy = rpc.proxy
     private val me = proxy.nodeInfo().legalIdentities.first().name
+    private val logger = LoggerFactory.getLogger(javaClass)
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(RestController::class.java)
-    }
-
-    fun X500Name.toDisplayString() : String  = BCStyle.INSTANCE.toString(this)
+    fun X500Name.toDisplayString(): String = BCStyle.INSTANCE.toString(this)
 
     /** Helpers for filtering the network map cache. */
     private fun isNotary(nodeInfo: NodeInfo) = proxy.notaryIdentities().any { nodeInfo.isLegalIdentity(it) }
     private fun isMe(nodeInfo: NodeInfo) = nodeInfo.legalIdentities.first().name == me
-    private fun isNetworkMap(nodeInfo: NodeInfo) = nodeInfo.legalIdentities.single().name.organisation == "Network Map Service"
+    private fun isNetworkMap(nodeInfo: NodeInfo) =
+        nodeInfo.legalIdentities.single().name.organisation == "Network Map Service"
 
     /**
      * Returns the node's name.
@@ -51,8 +45,8 @@ class Controller(rpc: NodeRPCConnection) {
     @GetMapping(value = ["peers"], produces = [APPLICATION_JSON_VALUE])
     fun getPeers(): Map<String, List<String>> {
         return mapOf("peers" to proxy.networkMapSnapshot()
-                .filter { isNotary(it).not() && isMe(it).not() && isNetworkMap(it).not() }
-                .map { it.legalIdentities.first().name.toX500Name().toDisplayString() })
+            .filter { isNotary(it).not() && isMe(it).not() && isNetworkMap(it).not() }
+            .map { it.legalIdentities.first().name.toX500Name().toDisplayString() })
     }
 
     @RequestMapping(value = ["/createToken"], method = [RequestMethod.POST])
@@ -61,18 +55,19 @@ class Controller(rpc: NodeRPCConnection) {
         println(payload)
         val convertedObject: JsonObject = Gson().fromJson(payload, JsonObject::class.java)
         val sender = convertedObject.get("senderEmail").toString()
-        val senderStr = sender.substring(1,sender.length-1)
+        val senderStr = sender.substring(1, sender.length - 1)
         val receiver = convertedObject.get("recipientEmail").toString()
-        val receiverStr = receiver.substring(1,receiver.length-1)
+        val receiverStr = receiver.substring(1, receiver.length - 1)
         val message = convertedObject.get("secretMessage").toString()
-        val messageStr = message.substring(1,message.length-1)
+        val messageStr = message.substring(1, message.length - 1)
 
         println(senderStr)
         println(receiverStr)
         println(messageStr)
         return try {
-            val tokenStateId = proxy.startFlow(::CreateMyToken,senderStr,receiverStr,messageStr).returnValue.get().toString()
-            val result = proxy.startFlow(::IssueToken,tokenStateId).returnValue.get()
+            val tokenStateId =
+                proxy.startFlow(::CreateMyToken, senderStr, receiverStr, messageStr).returnValue.get().toString()
+            val result = proxy.startFlow(::IssueToken, tokenStateId).returnValue.get()
             ResponseEntity.status(HttpStatus.CREATED).body(result)
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
@@ -85,11 +80,11 @@ class Controller(rpc: NodeRPCConnection) {
         println(payload)
         val convertedObject: JsonObject = Gson().fromJson(payload, JsonObject::class.java)
         val tokenId = convertedObject.get("tokenId").toString()
-        val tokenIdStr = tokenId.substring(1,tokenId.length-1)
+        val tokenIdStr = tokenId.substring(1, tokenId.length - 1)
         val receiver = convertedObject.get("recipientEmail").toString()
-        val receiverStr = receiver.substring(1,receiver.length-1)
+        val receiverStr = receiver.substring(1, receiver.length - 1)
         return try {
-            val result = proxy.startFlow(::QueryToken,tokenIdStr,receiverStr).returnValue.get().toString()
+            val result = proxy.startFlow(::QueryToken, tokenIdStr, receiverStr).returnValue.get().toString()
             print(result)
             ResponseEntity.status(HttpStatus.CREATED).body(result)
         } catch (e: Exception) {
@@ -97,8 +92,6 @@ class Controller(rpc: NodeRPCConnection) {
         }
 
     }
-
-
 
 
 }

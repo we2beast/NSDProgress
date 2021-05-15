@@ -1,8 +1,8 @@
-package net.corda.samples.tokentofriend.contracts
+package net.corda.nrd.contracts
 
 import com.r3.corda.lib.tokens.contracts.commands.EvolvableTokenTypeCommand
 import com.r3.corda.lib.tokens.contracts.commands.Update
-import net.corda.samples.tokentofriend.states.CustomTokenState
+import net.corda.nrd.states.CustomTokenState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
 import net.corda.testing.core.TestIdentity
