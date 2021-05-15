@@ -20,9 +20,9 @@ run vaultQuery contractStateType: com.r3.corda.lib.tokens.contracts.states.Fungi
  ```
 3. NSD:
  ```
-flow start IssueStockToken uuid: 6cf88bc7-1df1-4c2f-ab6b-0aaec66383b9
+flow start IssueStockToken uuid: a1e83e2d-65f6-4e9b-b80c-85292a96b938
 run vaultQuery contractStateType: net.corda.nrd.states.StockState // Получение всех аппрувнытых токенов
-flow start MoveStockToken quantity: 3, recipient: Radmir, uuid: 6cf88bc7-1df1-4c2f-ab6b-0aaec66383b9
+flow start MoveStockToken quantity: 3, recipient: Radmir, uuid: a1e83e2d-65f6-4e9b-b80c-85292a96b938
 flow start ShareAccountTo acctNameShared: Radmir, shareTo: ExampleOrg
  ```
 ```

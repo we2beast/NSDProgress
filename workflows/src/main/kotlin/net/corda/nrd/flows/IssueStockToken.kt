@@ -33,9 +33,9 @@ class IssueStockToken(
         val issuedToken = customTokenState.toPointer(customTokenState.javaClass) issuedBy ourIdentity
 
         val issueAmount = Amount(customTokenState.issueVol, issuedToken)
-        val stockToken = FungibleToken(issueAmount, customTokenState.issuer)
+        val stockToken = FungibleToken(issueAmount, customTokenState.issuer, null)
 
-        val stx = subFlow(IssueTokens(listOf(stockToken), listOf(customTokenState.issuer)))
+        val stx = subFlow(IssueTokens(listOf(stockToken), listOf(customTokenState.issuer, ourIdentity)))
 
         return stx.id.toString()
     }
