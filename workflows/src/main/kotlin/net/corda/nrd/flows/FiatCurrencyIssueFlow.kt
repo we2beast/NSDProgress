@@ -36,4 +36,5 @@ class FiatCurrencyIssueFlow(
         val stx = subFlow(IssueTokens(listOf(fungibleToken)))
         return "Issued $amount $currency token(s) to $recipient"
     }
+
 }

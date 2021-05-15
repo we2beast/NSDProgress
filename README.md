@@ -11,7 +11,7 @@ We have built a front end interface to make the interaction easier. Clone the ap
 1. NSD:
  ```
 flow start CreateNewAccount acctName: Radmir
-flow start FiatCurrencyIssueFlow currency: RUB, amount: 1000, recipient: Radmir
+flow start FiatCurrencyIssueFlow currency: RUB, amount: 100000, recipient: Radmir
  ```
 2. Example Org:
  ```
@@ -20,10 +20,17 @@ run vaultQuery contractStateType: com.r3.corda.lib.tokens.contracts.states.Fungi
  ```
 3. NSD:
  ```
-flow start IssueStockToken uuid: 59e4a0f8-4241-4005-9f76-5b5e76aa252c
+flow start IssueStockToken uuid: 6cf88bc7-1df1-4c2f-ab6b-0aaec66383b9
 run vaultQuery contractStateType: net.corda.nrd.states.StockState // Получение всех аппрувнытых токенов
+flow start MoveStockToken quantity: 3, recipient: Radmir, uuid: 6cf88bc7-1df1-4c2f-ab6b-0aaec66383b9
+flow start ShareAccountTo acctNameShared: Radmir, shareTo: ExampleOrg
  ```
- 
+```
+flow start GetStockTokenBalance uuid: 5b63e56b-d975-4ab0-a5ac-4e5a2337b285
+
+flow start QueryToken recipientEmail: Radmir, uuid: 5b63e56b-d975-4ab0-a5ac-4e5a2337b285
+``` 
+
  ## Running the applications 
  ```
  ./gradlew deployNodes

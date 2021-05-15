@@ -3,7 +3,6 @@ package net.corda.nrd.states
 import com.r3.corda.lib.tokens.contracts.states.EvolvableTokenType
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.identity.AnonymousParty
 import net.corda.core.identity.Party
 import net.corda.core.schemas.StatePersistable
 import net.corda.nrd.contracts.StockContract
