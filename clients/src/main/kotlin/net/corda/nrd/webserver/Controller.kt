@@ -1,13 +1,21 @@
 package net.corda.nrd.webserver
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import net.corda.nrd.flows.CreateStockToken
-import net.corda.nrd.flows.IssueStockToken
-import net.corda.nrd.flows.QueryToken
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.internal.toX500Name
 import net.corda.core.messaging.startFlow
 import net.corda.core.node.NodeInfo
+import net.corda.nrd.account.dto.AccountDTO
+import net.corda.nrd.flows.*
+import net.corda.nrd.flows.FiatCurrencyIssueFlow
+import net.corda.nrd.flows.accountsUtilities.CreateNewAccount
+import net.corda.nrd.flows.accountsUtilities.NewKeyForAccount
+import net.corda.nrd.flows.accountsUtilities.ShareAccountTo
+import net.corda.nrd.flows.accountsUtilities.ViewMyAccounts
+import net.corda.nrd.states.StockState
+import net.corda.nrd.token.rq.CreateTokenRq
+import net.corda.nrd.token.rq.FiatCurrencyIssueRq
+import net.corda.nrd.token.rq.MoveStockTokenRq
+import net.corda.nrd.token.rq.RetrieveTokenRq
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.slf4j.LoggerFactory
@@ -15,6 +23,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
+import java.security.PublicKey
+import java.util.*
 
 @RestController
 @RequestMapping("/")
@@ -22,7 +33,7 @@ class Controller(rpc: NodeRPCConnection) {
 
     private val proxy = rpc.proxy
     private val me = proxy.nodeInfo().legalIdentities.first().name
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
     fun X500Name.toDisplayString(): String = BCStyle.INSTANCE.toString(this)
 
@@ -49,49 +60,54 @@ class Controller(rpc: NodeRPCConnection) {
             .map { it.legalIdentities.first().name.toX500Name().toDisplayString() })
     }
 
-    @RequestMapping(value = ["/createToken"], method = [RequestMethod.POST])
-    @Throws(Exception::class)
-    fun createToken(@RequestBody payload: String?): ResponseEntity<String> {
-        println(payload)
-        val convertedObject: JsonObject = Gson().fromJson(payload, JsonObject::class.java)
-        val sender = convertedObject.get("senderEmail").toString()
-        val senderStr = sender.substring(1, sender.length - 1)
-        val receiver = convertedObject.get("recipientEmail").toString()
-        val receiverStr = receiver.substring(1, receiver.length - 1)
-        val message = convertedObject.get("secretMessage").toString()
-        val messageStr = message.substring(1, message.length - 1)
-
-        println(senderStr)
-        println(receiverStr)
-        println(messageStr)
-        return try {
-            val tokenStateId =
-                proxy.startFlow(::CreateStockToken, senderStr, receiverStr, messageStr).returnValue.get().toString()
-            val result = proxy.startFlow(::IssueStockToken, tokenStateId).returnValue.get()
-            ResponseEntity.status(HttpStatus.CREATED).body(result)
+    @PostMapping("/accounts/create")
+    fun createAccount(@RequestBody(required = true) request: AccountDTO): ResponseEntity<Map<String, String>> {
+        try {
+            val result = proxy.startFlow(
+                ::CreateNewAccount,
+                request.individualTaxpayerNumber!!
+            ).returnValue.get()
+            return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("user" to result)).also {
+                log.debug("Account ${request.individualTaxpayerNumber} Created")
+            }
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         }
     }
 
-    @RequestMapping(value = ["/retrieve"], method = [RequestMethod.POST])
-    @Throws(Exception::class)
-    fun retrieveToken(@RequestBody payload: String?): ResponseEntity<String> {
-        println(payload)
-        val convertedObject: JsonObject = Gson().fromJson(payload, JsonObject::class.java)
-        val tokenId = convertedObject.get("tokenId").toString()
-        val tokenIdStr = tokenId.substring(1, tokenId.length - 1)
-        val receiver = convertedObject.get("recipientEmail").toString()
-        val receiverStr = receiver.substring(1, receiver.length - 1)
-        return try {
-            val result = proxy.startFlow(::QueryToken, tokenIdStr, receiverStr).returnValue.get().toString()
-            print(result)
-            ResponseEntity.status(HttpStatus.CREATED).body(result)
+    // поделиться аккаунтами между узлами
+    @PostMapping("/accounts/share/{whoAmI}/{shareTo}")
+    fun shareAccount(@PathVariable whoAmI: String, @PathVariable shareTo: String): ResponseEntity<String> {
+        try {
+            val matchingPasties = proxy.partiesFromName(shareTo,false)
+            val result = proxy.startFlow(
+                ::ShareAccountTo,
+                whoAmI,
+                matchingPasties.first()
+            ).returnValue.get()
+            return ResponseEntity.status(HttpStatus.CREATED).body("Share Request has Sent")
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
         }
-
     }
 
+    @GetMapping("/accounts/my/accounts")
+    fun viewMyAccounts(): ResponseEntity<List<String>> {
+        try {
+            val result = proxy.startFlow(::ViewMyAccounts).returnValue.get()
+            return ResponseEntity.status(HttpStatus.CREATED).body(result)
+        } catch (e: Exception) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+        }
+    }
 
+    @GetMapping("/accounts/{accountId}/new-key")
+    fun newKeyForAccount(@PathVariable accountId: UUID): ResponseEntity<PublicKey> {
+        try {
+            val result = proxy.startFlow(::NewKeyForAccount, accountId).returnValue.get()
+            return ResponseEntity.status(HttpStatus.CREATED).body(result.owningKey)
+        } catch (e: Exception) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+        }
+    }
 }

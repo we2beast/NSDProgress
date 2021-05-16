@@ -18,11 +18,11 @@ import net.corda.nrd.flows.accountsUtilities.NewKeyForAccount
 class GetAllTokens(
     val status: String,
     val participant: String?
-) : FlowLogic<List<StateAndRef<FungibleToken>>>() {
+) : FlowLogic<List<FungibleToken>>() {
     override val progressTracker = ProgressTracker()
 
     @Suspendable
-    override fun call(): List<StateAndRef<FungibleToken>> {
+    override fun call(): List<FungibleToken> {
         val myAccount = if (participant != null)
             accountService.accountInfo(participant).single().state.data
         else null
@@ -31,15 +31,15 @@ class GetAllTokens(
         else null
 
         val inputCriteria = QueryCriteria.LinearStateQueryCriteria(
-            participants = myKey?.let { listOf(AnonymousParty(myKey)) },
             status = when (status) {
                 "consumed" -> Vault.StateStatus.CONSUMED
                 else -> Vault.StateStatus.UNCONSUMED
             }
         )
         return serviceHub.vaultService.queryBy(
-            FungibleToken::class.java,
-            criteria = inputCriteria
-        ).states
+            FungibleToken::class.java
+        ).states.map {
+            it.state.data
+        }
     }
 }
